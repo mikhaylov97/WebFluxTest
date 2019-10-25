@@ -9,15 +9,7 @@ public class Author {
     @Id
     private String id;
     private String name;
-
-    public Author(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Author(String name) {
-        this.name = name;
-    }
+    private String lastName;
 
     public Author() {
     }
@@ -36,5 +28,13 @@ public class Author {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

@@ -7,9 +7,8 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
-import static java.util.Optional.*;
+import static java.util.Optional.ofNullable;
 
 @Document
 public class Article {
@@ -22,21 +21,6 @@ public class Article {
     private String authorId;
     @Transient
     private Author author;
-
-    public Article(String id, String title, LocalDate publishedDate, Author author) {
-        this.id = id;
-        this.title = title;
-        this.publishedDate = publishedDate;
-        this.author = author;
-        this.authorId = ofNullable(author).map(Author::getId).orElseThrow(RuntimeException::new);
-    }
-
-    public Article(Author author) {
-        this.title = title;
-        this.publishedDate = LocalDate.now();
-        this.author = author;
-        this.authorId = ofNullable(author).map(Author::getId).orElseThrow(RuntimeException::new);
-    }
 
     public Article() {
         this.publishedDate = LocalDate.now();
@@ -82,5 +66,6 @@ public class Article {
 
     public void setAuthor(Author author) {
         this.author = author;
+//        return this;
     }
 }

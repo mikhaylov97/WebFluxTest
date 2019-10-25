@@ -3,8 +3,8 @@ package com.example.demo.service;
 import com.example.demo.model.Author;
 import com.example.demo.repository.AuthorRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class AuthorService {
@@ -15,11 +15,42 @@ public class AuthorService {
         this.repository = repository;
     }
 
-    public List<Author> getAllAuthors() {
+    public Flux<Author> getAllAuthors() {
         return repository.findAll();
     }
 
-    public void createAuthor(Author author) {
-        repository.save(author);
+    public Mono<Author> getAuthor(String id) {
+        return repository.findById(id);
+    }
+
+    public Mono<Author> createAuthor(Author author) {
+        return repository.save(author);
+    }
+
+    public Mono<Author> updateAuthor(Author author) {
+        return repository.save(author);
+    }
+
+    public Mono<Author> updateAuthor(String id, Author item) {
+        return repository
+                .findById(id)
+                .map(author -> {
+                    author.setName(item.getName());
+                    author.setLastName(item.getLastName());
+                    return author;
+                })
+                .flatMap(repository::save);
+    }
+
+    public Mono<Author> deleteAuthor(String id) {
+        return repository
+                .findById(id)
+                .flatMap(author -> repository.deleteById(id).thenReturn(author));
+    }
+
+    public Mono<Void> deleteAuthorAndReturnVoid(String id) {
+        return repository
+                .findById(id)
+                .flatMap(repository::delete);
     }
 }
