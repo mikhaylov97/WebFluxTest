@@ -1,21 +1,33 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Author;
+import com.example.demo.service.AuthorMVCService;
 import com.example.demo.service.AuthorService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("author")
 public class AuthorController {
 
     private final AuthorService service;
+    private final AuthorMVCService mvcService;
 
-    public AuthorController(AuthorService service) {
+    public AuthorController(AuthorService service, AuthorMVCService mvcService) {
         this.service = service;
+        this.mvcService = mvcService;
+    }
+
+    @GetMapping("/page")
+    public List<Author> getAuthorsPage(Pageable pageable) {
+        return mvcService.findAllAuthors(pageable).stream().collect(Collectors.toList());
     }
 
     @GetMapping
