@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 
@@ -66,6 +67,21 @@ public class Article {
 
     public void setAuthor(Author author) {
         this.author = author;
-//        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Article)) return false;
+
+        Article article = (Article) o;
+
+        return Objects.equals(id, article.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }
