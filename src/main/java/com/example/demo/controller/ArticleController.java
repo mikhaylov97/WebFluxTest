@@ -25,6 +25,11 @@ public class ArticleController {
         this.mvcService = mvcService;
     }
 
+    @GetMapping("/page/reactive")
+    public Flux<Article> getArticlesPageReactive(Pageable pageable) {
+        return articleService.getAllArticlesPaged(pageable);
+    }
+
     @GetMapping("/page")
     public List<Article> getAuthorsPage(Pageable pageable) {
         return mvcService.findAllArticles(pageable).stream().collect(Collectors.toList());

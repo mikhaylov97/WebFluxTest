@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.model.Article;
 import com.example.demo.repository.ArticleRepository;
 import com.example.demo.repository.AuthorRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +17,14 @@ public class ArticleService {
     public ArticleService(ArticleRepository articleRepository, AuthorRepository authorRepository) {
         this.articleRepository = articleRepository;
         this.authorRepository = authorRepository;
+    }
+
+    public Flux<Article> getAllArticlesPaged(final Pageable pageable) {
+        return articleRepository.findAllArticlesPaged(pageable)
+                .flatMap(article -> authorRepository.findById(article.getAuthorId()).map(author -> {
+                    article.setAuthor(author);
+                    return article;
+                }).switchIfEmpty(Mono.just(article)));
     }
 
     public Flux<Article> getAllArticles() {

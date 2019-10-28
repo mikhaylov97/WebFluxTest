@@ -25,6 +25,11 @@ public class AuthorController {
         this.mvcService = mvcService;
     }
 
+    @GetMapping("/page/reactive")
+    public Flux<Author> getAuthorsPageReactive(Pageable pageable) {
+        return service.getAllAuthorsPaged(pageable);
+    }
+
     @GetMapping("/page")
     public List<Author> getAuthorsPage(Pageable pageable) {
         return mvcService.findAllAuthors(pageable).stream().collect(Collectors.toList());

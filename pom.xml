@@ -19,6 +19,7 @@
 	</properties>
 
 	<dependencies>
+		<!--	Is needed for PaginationConfiguration (only for MVC, not necessary for reactive approach)	-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

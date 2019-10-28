@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.Author;
 import com.example.demo.repository.AuthorRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,6 +14,10 @@ public class AuthorService {
 
     public AuthorService(AuthorRepository repository) {
         this.repository = repository;
+    }
+
+    public Flux<Author> getAllAuthorsPaged(final Pageable pageable) {
+        return repository.findAllAuthorsPaged(pageable);
     }
 
     public Flux<Author> getAllAuthors() {

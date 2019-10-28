@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorMVCService {
 
-    final
-    AuthorMVCRepository repository;
+    private final AuthorMVCRepository repository;
 
     public AuthorMVCService(AuthorMVCRepository repository) {
         this.repository = repository;
