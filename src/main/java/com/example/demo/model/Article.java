@@ -76,12 +76,22 @@ public class Article {
 
         Article article = (Article) o;
 
-        return Objects.equals(id, article.id);
+        if (!Objects.equals(id, article.id)) return false;
+        if (!Objects.equals(title, article.title)) return false;
+        if (!Objects.equals(publishedDate, article.publishedDate))
+            return false;
+        if (!Objects.equals(authorId, article.authorId)) return false;
+        return Objects.equals(author, article.author);
 
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (publishedDate != null ? publishedDate.hashCode() : 0);
+        result = 31 * result + (authorId != null ? authorId.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        return result;
     }
 }

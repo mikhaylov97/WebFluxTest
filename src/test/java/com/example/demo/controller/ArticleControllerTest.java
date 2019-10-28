@@ -1,44 +1,26 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Article;
-import com.example.demo.model.Author;
 import com.example.demo.service.ArticleService;
-import com.example.demo.service.AuthorService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.LocalDate;
-
+import static com.example.demo.controller.ControllerTestUtil.*;
+import static com.example.demo.controller.ControllerTestUtil.HttpMethod.*;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = ArticleController.class)
 public class ArticleControllerTest {
-
-    private static final String FIRST_AUTHOR_ID = "1";
-    private static final String FIRST_AUTHOR_NAME = "TestName";
-    private static final String FIRST_AUTHOR_LAST_NAME = "TestLastName";
-
-    private static final String SECOND_AUTHOR_ID = "2";
-    private static final String SECOND_AUTHOR_NAME = "TestName2";
-    private static final String SECOND_AUTHOR_LAST_NAME = "TestLastName2";
-
-    private static final String FIRST_ARTICLE_ID = "1";
-    private static final String FIRST_ARTICLE_TITLE = "First title";
-
-    private static final String SECOND_ARTICLE_ID = "2";
-    private static final String SECOND_ARTICLE_TITLE = "Second title";
-
-    private static final LocalDate CURRENT_DATE = LocalDate.of(2019, 10, 28);
 
     @MockBean
     ArticleService articleService;
@@ -48,35 +30,14 @@ public class ArticleControllerTest {
 
     @Test
     void testGetAllArticles() {
-        Author firstAuthor = new Author();
-        firstAuthor.setId(FIRST_AUTHOR_ID);
-        firstAuthor.setName(FIRST_AUTHOR_NAME);
-        firstAuthor.setLastName(FIRST_AUTHOR_LAST_NAME);
+        Article firstArticle = createFirstArticle();
 
-        Article firstArticle = new Article();
-        firstArticle.setId(FIRST_ARTICLE_ID);
-        firstArticle.setPublishedDate(CURRENT_DATE);
-        firstArticle.setTitle(FIRST_ARTICLE_TITLE);
-        firstArticle.setAuthor(firstAuthor);
-
-        Author secondAuthor = new Author();
-        secondAuthor.setId(SECOND_AUTHOR_ID);
-        secondAuthor.setName(SECOND_AUTHOR_NAME);
-        secondAuthor.setLastName(SECOND_AUTHOR_LAST_NAME);
-
-        Article secondArticle = new Article();
-        secondArticle.setId(SECOND_ARTICLE_ID);
-        secondArticle.setPublishedDate(CURRENT_DATE);
-        secondArticle.setTitle(SECOND_ARTICLE_TITLE);
-        secondArticle.setAuthor(secondAuthor);
+        Article secondArticle = createSecondArticle();
 
         Mockito.when(articleService.getAllArticles()).thenReturn(Flux.just(firstArticle, secondArticle));
 
-        StepVerifier.create(webClient.get()
-                .uri("/article")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
+        StepVerifier.create(ControllerTestUtil
+                .prepareWebClient(webClient, GET, "/article")
                 .returnResult(Article.class)
                 .getResponseBody()
         )
@@ -85,5 +46,95 @@ public class ArticleControllerTest {
                 .verifyComplete();
 
         Mockito.verify(articleService, times(1)).getAllArticles();
+    }
+
+    @Test
+    void testGetArticleById() {
+        Article firstArticle = createFirstArticle();
+
+        Mockito.when(articleService.getArticle(FIRST_ARTICLE_ID)).thenReturn(Mono.just(firstArticle));
+
+        StepVerifier.create(ControllerTestUtil
+                .prepareWebClient(webClient, GET, "/article/" + FIRST_ARTICLE_ID)
+                .returnResult(Article.class)
+                .getResponseBody()
+        )
+                .expectSubscription()
+                .expectNext(firstArticle)
+                .verifyComplete();
+
+        Mockito.verify(articleService, times(1)).getArticle(FIRST_ARTICLE_ID);
+    }
+
+    @Test
+    void testCreateArticle() {
+        Article firstArticle = createFirstArticle();
+
+        Mockito.when(articleService.createArticle(firstArticle)).thenReturn(Mono.just(firstArticle));
+
+        StepVerifier.create(ControllerTestUtil
+                .prepareWebClient(webClient, POST, "/article", firstArticle)
+                .returnResult(Article.class)
+                .getResponseBody()
+        )
+                .expectSubscription()
+                .expectNext(firstArticle)
+                .verifyComplete();
+
+        Mockito.verify(articleService, times(1)).createArticle(firstArticle);
+    }
+
+    @Test
+    void testUpdateArticle() {
+        Article firstArticle = createFirstArticle();
+
+        Mockito.when(articleService.updateArticle(FIRST_ARTICLE_ID, firstArticle)).thenReturn(Mono.just(firstArticle));
+
+        StepVerifier.create(ControllerTestUtil
+                .prepareWebClient(webClient, PATCH, "/article/" + FIRST_ARTICLE_ID, firstArticle)
+                .returnResult(Article.class)
+                .getResponseBody()
+        )
+                .expectSubscription()
+                .expectNext(firstArticle)
+                .verifyComplete();
+
+        Mockito.verify(articleService, times(1)).updateArticle(FIRST_ARTICLE_ID, firstArticle);
+    }
+
+    @Test
+    void testUpdateArticleAndReturnWithAuthor() {
+        Article firstArticle = createFirstArticle();
+
+        Mockito.when(articleService.updateArticleAndReturnWithAuthor(FIRST_ARTICLE_ID, firstArticle)).thenReturn(Mono.just(firstArticle));
+
+        StepVerifier.create(ControllerTestUtil
+                .prepareWebClient(webClient, PATCH, "/article/" + FIRST_ARTICLE_ID + "/full", firstArticle)
+                .returnResult(Article.class)
+                .getResponseBody()
+        )
+                .expectSubscription()
+                .expectNext(firstArticle)
+                .verifyComplete();
+
+        Mockito.verify(articleService, times(1)).updateArticleAndReturnWithAuthor(FIRST_ARTICLE_ID, firstArticle);
+    }
+
+    @Test
+    void testDeleteArticle() {
+        Article firstArticle = createFirstArticle();
+
+        Mockito.when(articleService.deleteArticle(FIRST_ARTICLE_ID)).thenReturn(Mono.just(firstArticle));
+
+        StepVerifier.create(ControllerTestUtil
+                .prepareWebClient(webClient, DELETE, "/article/" + FIRST_ARTICLE_ID)
+                .returnResult(Article.class)
+                .getResponseBody()
+        )
+                .expectSubscription()
+                .expectNext(firstArticle)
+                .verifyComplete();
+
+        Mockito.verify(articleService, times(1)).deleteArticle(FIRST_ARTICLE_ID);
     }
 }
