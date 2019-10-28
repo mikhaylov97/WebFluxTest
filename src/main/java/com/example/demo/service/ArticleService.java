@@ -24,16 +24,17 @@ public class ArticleService {
                 .flatMap(article -> authorRepository.findById(article.getAuthorId()).map(author -> {
                     article.setAuthor(author);
                     return article;
-                }));
+                }).switchIfEmpty(Mono.just(article)));
     }
 
     public Mono<Article> getArticle(String id) {
-        return articleRepository
-                .findById(id)
+        Mono<Article> foundArticle = articleRepository.findById(id);
+        return foundArticle
                 .flatMap(article -> authorRepository.findById(article.getAuthorId()).map(author -> {
                     article.setAuthor(author);
                     return article;
-                }));
+                }).switchIfEmpty(foundArticle))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Incorrect id value!")));
     }
 
     public Mono<Article> createArticle(Article article) {

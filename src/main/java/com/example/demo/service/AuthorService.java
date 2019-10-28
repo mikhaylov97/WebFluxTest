@@ -20,7 +20,7 @@ public class AuthorService {
     }
 
     public Mono<Author> getAuthor(String id) {
-        return repository.findById(id);
+        return repository.findById(id).switchIfEmpty(Mono.error(new IllegalArgumentException("Incorrect id value!")));
     }
 
     public Mono<Author> createAuthor(Author author) {

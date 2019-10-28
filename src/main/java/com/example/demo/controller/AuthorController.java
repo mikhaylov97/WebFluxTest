@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Author;
 import com.example.demo.service.AuthorService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,8 +24,12 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}")
-    public Mono<Author> getAuthorById(@PathVariable(name = "id") String id) {
-        return service.getAuthor(id);
+    public Mono<Author> getAuthorById(@PathVariable(name = "id") String id,
+                                      ServerHttpResponse response) {
+        return service.getAuthor(id).onErrorResume(error -> {
+            response.setStatusCode(HttpStatus.NOT_FOUND);
+            return Mono.empty();
+        });
     }
 
     @PostMapping

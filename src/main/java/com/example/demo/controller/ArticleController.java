@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Article;
 import com.example.demo.service.ArticleService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,8 +24,12 @@ public class ArticleController {
     }
 
     @GetMapping("/{id}")
-    public Mono<Article> getArticleById(@PathVariable(name = "id") String id) {
-        return articleService.getArticle(id);
+    public Mono<Article> getArticleById(@PathVariable(name = "id") String id,
+                                        ServerHttpResponse response) {
+        return articleService.getArticle(id).onErrorResume(error -> {
+            response.setStatusCode(HttpStatus.NOT_FOUND);
+            return Mono.empty();
+        });
     }
 
     @PostMapping()
