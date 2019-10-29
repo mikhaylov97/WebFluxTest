@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -37,7 +38,7 @@ public class ArticleControllerTest {
         Mockito.when(articleService.getAllArticles()).thenReturn(Flux.just(firstArticle, secondArticle));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, GET, "/article")
+                .prepareWebClient(webClient, GET, "/article", HttpStatus.OK)
                 .returnResult(Article.class)
                 .getResponseBody()
         )
@@ -55,7 +56,7 @@ public class ArticleControllerTest {
         Mockito.when(articleService.getArticle(FIRST_ARTICLE_ID)).thenReturn(Mono.just(firstArticle));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, GET, "/article/" + FIRST_ARTICLE_ID)
+                .prepareWebClient(webClient, GET, "/article/" + FIRST_ARTICLE_ID, HttpStatus.OK)
                 .returnResult(Article.class)
                 .getResponseBody()
         )
@@ -73,7 +74,7 @@ public class ArticleControllerTest {
         Mockito.when(articleService.createArticle(firstArticle)).thenReturn(Mono.just(firstArticle));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, POST, "/article", firstArticle)
+                .prepareWebClient(webClient, POST, "/article", firstArticle, HttpStatus.OK)
                 .returnResult(Article.class)
                 .getResponseBody()
         )
@@ -91,7 +92,7 @@ public class ArticleControllerTest {
         Mockito.when(articleService.updateArticle(FIRST_ARTICLE_ID, firstArticle)).thenReturn(Mono.just(firstArticle));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, PATCH, "/article/" + FIRST_ARTICLE_ID, firstArticle)
+                .prepareWebClient(webClient, PATCH, "/article/" + FIRST_ARTICLE_ID, firstArticle, HttpStatus.OK)
                 .returnResult(Article.class)
                 .getResponseBody()
         )
@@ -109,7 +110,7 @@ public class ArticleControllerTest {
         Mockito.when(articleService.updateArticleAndReturnWithAuthor(FIRST_ARTICLE_ID, firstArticle)).thenReturn(Mono.just(firstArticle));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, PATCH, "/article/" + FIRST_ARTICLE_ID + "/full", firstArticle)
+                .prepareWebClient(webClient, PATCH, "/article/" + FIRST_ARTICLE_ID + "/full", firstArticle, HttpStatus.OK)
                 .returnResult(Article.class)
                 .getResponseBody()
         )
@@ -127,7 +128,7 @@ public class ArticleControllerTest {
         Mockito.when(articleService.deleteArticle(FIRST_ARTICLE_ID)).thenReturn(Mono.just(firstArticle));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, DELETE, "/article/" + FIRST_ARTICLE_ID)
+                .prepareWebClient(webClient, DELETE, "/article/" + FIRST_ARTICLE_ID, HttpStatus.OK)
                 .returnResult(Article.class)
                 .getResponseBody()
         )

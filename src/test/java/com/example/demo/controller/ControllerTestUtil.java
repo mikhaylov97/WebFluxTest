@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Article;
 import com.example.demo.model.Author;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -21,6 +22,9 @@ public class ControllerTestUtil {
 
     static final String SECOND_ARTICLE_ID = "2";
     static final String SECOND_ARTICLE_TITLE = "Second title";
+
+    static final int AUTHOR_DEFAULT_PAGE_NUMBER = 0;
+    static final int AUTHOR_DEFAULT_PAGE_SIZE = 5;
 
     static Article createFirstArticle() {
         Article article = new Article();
@@ -58,18 +62,19 @@ public class ControllerTestUtil {
         return author;
     }
 
-    static WebTestClient.ResponseSpec prepareWebClient(WebTestClient client, HttpMethod httpMethod, String uri) {
-        return prepareWebClient(client, httpMethod, uri, null);
+    static WebTestClient.ResponseSpec prepareWebClient(WebTestClient client, HttpMethod httpMethod, String uri, HttpStatus expectedStatus) {
+        return prepareWebClient(client, httpMethod, uri, null, expectedStatus);
     }
 
-    static <T> WebTestClient.ResponseSpec prepareWebClient(WebTestClient client, HttpMethod httpMethod, String uri, T body) {
+
+    static <T> WebTestClient.ResponseSpec prepareWebClient(WebTestClient client, HttpMethod httpMethod, String uri, T body, HttpStatus expectedStatus) {
         switch (httpMethod) {
             case GET:
                 return client.get()
                         .uri(uri)
                         .accept(MediaType.APPLICATION_JSON)
                         .exchange()
-                        .expectStatus().isOk();
+                        .expectStatus().isEqualTo(expectedStatus);
             case POST:
                 return client.post()
                         .uri(uri)
@@ -77,7 +82,7 @@ public class ControllerTestUtil {
                         .body(Mono.just(body), body.getClass())
                         .accept(MediaType.APPLICATION_JSON)
                         .exchange()
-                        .expectStatus().isOk();
+                        .expectStatus().isEqualTo(expectedStatus);
             case PATCH:
                 return client.patch()
                         .uri(uri)
@@ -85,13 +90,13 @@ public class ControllerTestUtil {
                         .body(Mono.just(body), body.getClass())
                         .accept(MediaType.APPLICATION_JSON)
                         .exchange()
-                        .expectStatus().isOk();
+                        .expectStatus().isEqualTo(expectedStatus);
             case DELETE:
                 return client.delete()
                         .uri(uri)
                         .accept(MediaType.APPLICATION_JSON)
                         .exchange()
-                        .expectStatus().isOk();
+                        .expectStatus().isEqualTo(expectedStatus);
         }
 
         throw new IllegalArgumentException("Passed illegal http method. Should be GET or POST or PATCH or DELETE.");

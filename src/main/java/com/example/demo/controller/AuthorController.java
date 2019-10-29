@@ -4,6 +4,7 @@ import com.example.demo.model.Author;
 import com.example.demo.service.AuthorMVCService;
 import com.example.demo.service.AuthorService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class AuthorController {
     }
 
     @GetMapping("/page/reactive")
-    public Flux<Author> getAuthorsPageReactive(Pageable pageable) {
+    public Flux<Author> getAuthorsPageReactive(@PageableDefault(size = 5) Pageable pageable) {
         return service.getAllAuthorsPaged(pageable);
     }
 
