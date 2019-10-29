@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Article;
-import com.example.demo.service.ArticleMVCService;
 import com.example.demo.service.ArticleService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -10,19 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("article")
 public class ArticleController {
 
     private final ArticleService articleService;
-    private final ArticleMVCService mvcService;
 
-    public ArticleController(ArticleService articleService, ArticleMVCService mvcService) {
+    public ArticleController(ArticleService articleService) {
         this.articleService = articleService;
-        this.mvcService = mvcService;
     }
 
     @GetMapping("/page/reactive")
@@ -30,10 +24,6 @@ public class ArticleController {
         return articleService.getAllArticlesPaged(pageable);
     }
 
-    @GetMapping("/page")
-    public List<Article> getAuthorsPage(Pageable pageable) {
-        return mvcService.findAllArticles(pageable).stream().collect(Collectors.toList());
-    }
 
     @GetMapping()
     public Flux<Article> getAllArticles() {
@@ -57,19 +47,31 @@ public class ArticleController {
     // From this entry point updated and returned article won't contain author data.
     @PatchMapping("/{id}")
     public Mono<Article> updateArticle(@PathVariable(name = "id") String id,
-                                       @RequestBody Article article) {
-        return articleService.updateArticle(id, article);
+                                       @RequestBody Article article,
+                                       ServerHttpResponse response) {
+        return articleService.updateArticle(id, article).onErrorResume(error -> {
+            response.setStatusCode(HttpStatus.NOT_FOUND);
+            return Mono.empty();
+        });
     }
 
     // From this entry point updated and returned article will contain author data.
     @PatchMapping("/{id}/full")
     public Mono<Article> updateArticleAndReturnWithAuthor(@PathVariable(name = "id") String id,
-                                                          @RequestBody Article article) {
-        return articleService.updateArticleAndReturnWithAuthor(id, article);
+                                                          @RequestBody Article article,
+                                                          ServerHttpResponse response) {
+        return articleService.updateArticleAndReturnWithAuthor(id, article).onErrorResume(error -> {
+            response.setStatusCode(HttpStatus.NOT_FOUND);
+            return Mono.empty();
+        });
     }
 
     @DeleteMapping("/{id}")
-    public Mono<Article> deleteArticle(@PathVariable(name = "id") String id) {
-        return articleService.deleteArticle(id);
+    public Mono<Article> deleteArticle(@PathVariable(name = "id") String id,
+                                       ServerHttpResponse response) {
+        return articleService.deleteArticle(id).onErrorResume(error -> {
+            response.setStatusCode(HttpStatus.NOT_FOUND);
+            return Mono.empty();
+        });
     }
 }

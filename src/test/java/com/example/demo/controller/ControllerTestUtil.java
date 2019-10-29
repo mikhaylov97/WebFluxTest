@@ -35,6 +35,15 @@ public class ControllerTestUtil {
         return article;
     }
 
+    static Article createFirstArticleWithoutAuthor() {
+        Article article = new Article();
+        article.setId(FIRST_ARTICLE_ID);
+        article.setTitle(FIRST_ARTICLE_TITLE);
+        article.setAuthorId(FIRST_AUTHOR_ID);
+
+        return article;
+    }
+
     static Article createSecondArticle() {
         Article article = new Article();
         article.setId(SECOND_ARTICLE_ID);
@@ -43,6 +52,16 @@ public class ControllerTestUtil {
 
         return article;
     }
+
+    static Article createSecondArticleWithoutAuthor() {
+        Article article = new Article();
+        article.setId(SECOND_ARTICLE_ID);
+        article.setTitle(SECOND_ARTICLE_TITLE);
+        article.setAuthorId(SECOND_AUTHOR_ID);
+
+        return article;
+    }
+
 
     static Author createFirstAuthor() {
         Author author = new Author();

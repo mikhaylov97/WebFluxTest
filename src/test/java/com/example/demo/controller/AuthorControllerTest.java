@@ -2,9 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.config.WebFluxConfigurer;
 import com.example.demo.model.Author;
-import com.example.demo.repository.AuthorMVCRepository;
 import com.example.demo.repository.AuthorRepository;
-import com.example.demo.service.AuthorMVCService;
 import com.example.demo.service.AuthorService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,14 +27,11 @@ import static org.mockito.Mockito.times;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = AuthorController.class)
-@Import({AuthorService.class, AuthorMVCService.class, WebFluxConfigurer.class})
+@Import({AuthorService.class, WebFluxConfigurer.class})
 public class AuthorControllerTest {
 
     @MockBean
     AuthorRepository authorRepository;
-
-    @MockBean
-    AuthorMVCRepository authorMVCRepository;
 
     @Autowired
     private WebTestClient webClient;
@@ -354,10 +349,10 @@ public class AuthorControllerTest {
     void testGetAuthorById() {
         Author author = createFirstAuthor();
 
-        Mockito.when(authorRepository.findById(FIRST_AUTHOR_ID)).thenReturn(Mono.just(author));
+        Mockito.when(authorRepository.findById(author.getId())).thenReturn(Mono.just(author));
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, GET, "/author/" + FIRST_AUTHOR_ID, HttpStatus.OK)
+                .prepareWebClient(webClient, GET, "/author/" + author.getId(), HttpStatus.OK)
                 .returnResult(Author.class)
                 .getResponseBody()
         )
@@ -367,7 +362,7 @@ public class AuthorControllerTest {
                         && a.getLastName().equals(FIRST_AUTHOR_LAST_NAME))
                 .verifyComplete();
 
-        Mockito.verify(authorRepository, times(1)).findById(FIRST_AUTHOR_ID);
+        Mockito.verify(authorRepository, times(1)).findById(author.getId());
     }
 
     @Test
@@ -485,18 +480,18 @@ public class AuthorControllerTest {
     void testDeleteAuthorWithReturnedVoid() {
         Author author = createFirstAuthor();
 
-        Mockito.when(authorRepository.findById(FIRST_AUTHOR_ID)).thenReturn(Mono.just(author));
+        Mockito.when(authorRepository.findById(author.getId())).thenReturn(Mono.just(author));
         Mockito.when(authorRepository.delete(author)).thenReturn(Mono.empty());
 
         StepVerifier.create(ControllerTestUtil
-                .prepareWebClient(webClient, DELETE, "/author/" + FIRST_AUTHOR_ID + "/void", HttpStatus.OK)
+                .prepareWebClient(webClient, DELETE, "/author/" + author.getId() + "/void", HttpStatus.OK)
                 .returnResult(Author.class)
                 .getResponseBody()
         )
                 .expectSubscription()
                 .verifyComplete();
 
-        Mockito.verify(authorRepository, times(1)).findById(FIRST_AUTHOR_ID);
+        Mockito.verify(authorRepository, times(1)).findById(author.getId());
         Mockito.verify(authorRepository, times(1)).delete(author);
     }
 }

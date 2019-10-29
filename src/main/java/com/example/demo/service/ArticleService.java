@@ -53,12 +53,14 @@ public class ArticleService {
     public Mono<Article> updateArticle(String id, Article item) {
         return articleRepository
                 .findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Incorrect id value!")))
                 .map(article -> {
                     article.setTitle(item.getTitle());
                     article.setPublishedDate(item.getPublishedDate());
                     article.setAuthorId(item.getAuthorId());
                     return article;
-                }).flatMap(articleRepository::save);
+                })
+                .flatMap(articleRepository::save);
     }
 
     public Mono<Article> updateArticleAndReturnWithAuthor(String id, Article item) {
@@ -70,16 +72,18 @@ public class ArticleService {
                     article.setAuthorId(item.getAuthorId());
                     return article;
                 })
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Incorrect id value!")))
                 .flatMap(articleRepository::save)
                 .flatMap(article -> authorRepository.findById(article.getAuthorId()).map(author -> {
                     article.setAuthor(author);
                     return article;
-                }));
+                }).switchIfEmpty(Mono.just(article)));
     }
 
     public Mono<Article> deleteArticle(String id) {
         return articleRepository
                 .findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Incorrect id value!")))
                 .flatMap(article -> articleRepository.deleteById(id).thenReturn(article));
     }
 }
