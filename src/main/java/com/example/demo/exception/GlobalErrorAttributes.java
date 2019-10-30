@@ -18,6 +18,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             map.put("statusCode", ((CoreException) exception).getHttpStatus().value());
             map.put("status", ((CoreException) exception).getHttpStatus());
             map.put("message", exception.getMessage());
+            map.put("error", ((CoreException) exception).getHttpStatus().getReasonPhrase());
 
             return map;
         }
