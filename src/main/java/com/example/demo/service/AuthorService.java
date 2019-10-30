@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.CoreException;
 import com.example.demo.model.Author;
 import com.example.demo.repository.AuthorRepository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,7 +27,7 @@ public class AuthorService {
     }
 
     public Mono<Author> getAuthor(String id) {
-        return repository.findById(id).switchIfEmpty(Mono.error(new IllegalArgumentException("Incorrect id value!")));
+        return repository.findById(id).switchIfEmpty(Mono.error(new CoreException(HttpStatus.NOT_FOUND, "Incorrect id value!")));
     }
 
     public Mono<Author> createAuthor(Author author) {

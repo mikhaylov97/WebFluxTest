@@ -31,12 +31,8 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}")
-    public Mono<Author> getAuthorById(@PathVariable(name = "id") String id,
-                                      ServerHttpResponse response) {
-        return service.getAuthor(id).onErrorResume(error -> {
-            response.setStatusCode(HttpStatus.NOT_FOUND);
-            return Mono.empty();
-        });
+    public Mono<Author> getAuthorById(@PathVariable(name = "id") String id) {
+        return service.getAuthor(id);
     }
 
     @PostMapping

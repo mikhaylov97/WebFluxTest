@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import static java.util.Optional.ofNullable;
-
 @Document
 public class Article {
 
